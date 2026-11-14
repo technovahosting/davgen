@@ -1,8 +1,8 @@
 # CLAUDE.md — davgen 5
 
 > Versión: `src/davgen/nucleo/version.py` (única fuente). Cambios: `CHANGELOG.md`.
-> Este repositorio está pensado para hacerse **público**: todo lo que se escriba
-> aquí —código, plantillas, pruebas, documentos, este archivo— debe poder leerlo
+> Este repositorio **es público**: todo lo que se escriba aquí —código,
+> plantillas, pruebas, documentos, mensajes de commit, este archivo— lo lee
 > cualquiera.
 
 ## Qué es
@@ -13,6 +13,11 @@ frontend React y pruebas, y puede desplegar por FTP a hosting compartido.
 La v5 es la v4.36 reorganizada para publicarse: paquete instalable, plantillas
 como datos, pruebas, y sin nada propio del autor adentro.
 
+El repositorio es además un **plugin de Claude Code** (`.claude-plugin/`) con
+la skill `crear-sistema` (`skills/crear-sistema/`): con ella Claude lleva a una
+persona —pensada para estudiantes— de «quiero un sistema de…» al sistema
+funcionando. Guía de uso: `docs/skill.md`.
+
 Mapa del código y de la arquitectura generada: `docs/arquitectura.md`.
 
 ## Cómo trabajar aquí
@@ -21,6 +26,8 @@ Mapa del código y de la arquitectura generada: `docs/arquitectura.md`.
 .\scripts\probar.ps1              # venv en .tmp\ + ruff + pytest (sin BD/FTP/composer/node)
 .\scripts\probar.ps1 -Paquete     # además construye el wheel y lo prueba instalado
 python scripts\generar_ejemplo.py .tmp\x --extras   # proyecto de ejemplo generado
+python scripts\empaquetar_skill.py                  # dist\crear-sistema.zip (skill + código)
+claude plugin validate .                            # revisa .claude-plugin\ y la skill
 ```
 
 - `davgen` se puede ejecutar directo desde la terminal de Claude: **no pide
@@ -75,6 +82,24 @@ python scripts\generar_ejemplo.py .tmp\x --extras   # proyecto de ejemplo genera
     negocio en la BD (solo `tbl_seg_*` vía script y los `pcru*`); la
     administración del sistema generado vive en `tbl_seg_*`.
 11. Consola y código generado en español.
+12. **Ninguna contraseña en el código, ni de ejemplo ni «histórica».** La del
+    administrador la escribe el usuario (`[seguridad] admin_password` del
+    archivo de accesos, por teclado, o `DAVGEN_ADMIN_PASSWORD` en CI); davgen
+    no la inventa, no la asume y no la muestra en la consola. Las reglas de
+    fortaleza son por forma (`configuracion.problema_admin_password`), nunca
+    una lista de contraseñas. `tests/test_publicacion.py` lo vigila.
+13. **Las guardas no nombran lo que protegen.** Una prueba que busca un dato
+    delicado lo detecta por su forma (patrón) o lo arma por partes; escribir
+    el valor real en la prueba es publicarlo.
+14. **La skill solo enseña lo que existe.** Todo comando, opción o clave del
+    `.ini` que aparezca en `skills/crear-sistema/` se comprueba en
+    `tests/test_skill.py`; al cambiar un comando de davgen, actualizar la
+    skill en el mismo cambio. La versión de `.claude-plugin/plugin.json` debe
+    ser igual a `VERSION`.
+15. **Nada de lo legal se presenta como asesoría.** Los textos generados
+    (`plantillas/legal/`) y `DESCARGO.md` son plantillas y orientación; las
+    menciones a normas llevan «verificar con un abogado». No afirmar que algo
+    «cumple» una ley.
 
 ## Trampas conocidas
 
@@ -88,6 +113,17 @@ python scripts\generar_ejemplo.py .tmp\x --extras   # proyecto de ejemplo genera
   proyecto trae plantillas propias; las pruebas lo restablecen con un fixture
   `autouse`. Un módulo nuevo que cargue plantillas debe hacerlo con
   `_plantilla(ruta, __name__, 'CONSTANTE')` para quedar registrado.
+- **PowerShell 5.1 rompe los acentos al reescribir archivos**: `Get-Content`
+  lee UTF-8 sin BOM como ANSI y `Set-Content -Encoding utf8` agrega BOM. Un
+  `SKILL.md` con BOM deja de reconocerse. Para reemplazos en archivos usar la
+  herramienta de edición o un script de Python con `encoding='utf-8'` y
+  `newline=''`.
+- **`generar` sin `--local` ejecuta `composer` antes de generar**
+  (`validar_entorno_backend`): una prueba que lo invoque descarga Laravel y
+  falla o tarda según el equipo. Lo que deba detenerse antes (p. ej. la
+  contraseña del administrador) se comprueba en `_main`, antes de ese paso.
+- **El CI corre en Windows y Linux**: una prueba que pasa en local puede
+  fallar allá por depender de herramientas instaladas (composer, php).
 - **PowerShell 5.1**: `$ErrorActionPreference = 'Continue'` en los scripts que
   llaman a pip/pyinstaller (escriben en stderr sin fallar); `Set-Content` mete
   BOM → leer `.ini`/`.env` con `utf-8-sig`.
@@ -105,6 +141,36 @@ La subida por FTP en sí, la creación de proyectos con `composer`/`npm`,
 `leer_bd` contra un MySQL real y `scripts/empaquetar-plantillas.ps1`. Tocar esas
 zonas exige una prueba manual y decirlo en el PR. Lista de pendientes:
 `CHANGELOG.md` → «Pendiente».
+
+## Publicación y estado
+
+- El historial público es de **un solo commit** y los commits se firman con el
+  correo anónimo de GitHub (`…@users.noreply.github.com`), nunca con un correo
+  personal. Antes de un `push`, revisar `git log --format='%ae'`.
+- **Crear un Release dispara `publicar.yml`, que publica en PyPI.** No crear
+  releases ni etiquetas `v*` sin que el autor lo pida; lista de control en
+  `docs/publicar.md`.
+- La versión 5.1.0 está en el repositorio pero **sin Release**: no está en
+  PyPI y `dist/crear-sistema.zip` no está adjunto en ningún lado (la guía de
+  la skill lo menciona como descarga).
+
+Pendiente, en orden de utilidad:
+
+1. Recoger lo que reporten los primeros estudiantes al instalar con `/plugin`
+   y usar la skill (nunca se probó desde otra máquina) y ajustar
+   `skills/crear-sistema/` y `docs/skill.md`.
+2. Fallos del generador anotados en `CHANGELOG.md` → «Pendiente (detectado al
+   usar la 5.0)»: las pruebas generadas de rutas usan direcciones de la 4.x;
+   un `<select>` con más de 10 opciones pierde las sobrantes sin avisar; el
+   listado público no filtra los inactivos en el servidor; todas las columnas
+   del mockup salen obligatorias. Los dos del mockup están documentados como
+   límites en `skills/crear-sistema/referencias/mockup.md`: al corregirlos,
+   quitar esa fila.
+3. Primer Release (PyPI + `.zip` de la skill) e ícono del plugin
+   (`.claude-plugin/icon.png`, opcional).
+4. `api.js` y `App.jsx` solo se escriben la primera vez: los proyectos ya
+   generados no reciben `descargar()` ni `<AvisoLegal conAceptacion />` solos.
+   Falta una forma de avisarlo (¿`davgen actualizar`?).
 
 ## Relación con la v4
 
