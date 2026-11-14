@@ -1,0 +1,8 @@
+{{
+  "appId": "{app_id}",
+  "appName": "{nombre}",
+  "webDir": "dist",
+  "server": {{
+    "androidScheme": "https"
+  }}
+}}

@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "davgen"
+dynamic = ["version"]
+description = "Generador full-stack: de una base MySQL o un mockup HTML a un sistema Laravel + React, con despliegue a hosting compartido por FTP."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "AVISOS-TERCEROS.md"]
+requires-python = ">=3.10"
+authors = [{ name = "David Serrudo" }]
+keywords = ["generador", "scaffolding", "laravel", "react", "mysql", "crud", "ftp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Natural Language :: Spanish",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Code Generators",
+]
+# Tres dependencias, todas con licencia permisiva:
+#   bcrypt       (Apache-2.0)      — hash de la contraseña inicial del administrador
+#   PyMySQL      (MIT)             — leer el esquema y aplicar SPs/seeds en MySQL/MariaDB
+#   cryptography (Apache-2.0/BSD)  — accesos cifrados (AES-256-GCM)
+dependencies = [
+    "bcrypt>=4.0",
+    "PyMySQL>=1.1",
+    "cryptography>=42",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "build>=1.2"]
+
+[project.urls]
+Repositorio = "https://github.com/technovahosting/davgen"
+Cambios = "https://github.com/technovahosting/davgen/blob/main/CHANGELOG.md"
+
+[project.scripts]
+davgen = "davgen.cli:ejecutar"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = { attr = "davgen.nucleo.version.VERSION" }
+
+[tool.setuptools.package-data]
+davgen = ["plantillas/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["error::SyntaxWarning"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+src = ["src", "tests", "scripts"]
+extend-exclude = ["src/davgen/plantillas"]
+
+[tool.ruff.lint]
+# Errores reales (nombres sin definir, imports rotos, sintaxis). El estilo del
+# código heredado de la v4 se irá ajustando módulo por módulo.
+select = ["E9", "F63", "F7", "F82", "F401", "F811", "F841"]

@@ -1,0 +1,81 @@
+# CI de davgen (el generador). No confundir con el ci.yml que davgen puede
+# generar para un PROYECTO ([generar] ci = si).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: Pruebas · ${{ matrix.os }} · Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.10', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      # PHP solo para validar la sintaxis del código generado (php -l)
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Instalar
+        run: python -m pip install -e ".[dev]"
+      - name: Linter
+        run: python -m ruff check src tests scripts
+      - name: Pruebas
+        run: python -m pytest
+
+  paquete:
+    name: Paquete instalable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Construir sdist + wheel
+        run: |
+          python -m pip install build
+          python -m build
+      - name: Instalar el wheel en limpio y generar el ejemplo
+        run: |
+          python -m venv /tmp/limpio
+          /tmp/limpio/bin/pip install dist/*.whl
+          mkdir /tmp/proyecto && cd /tmp/proyecto
+          /tmp/limpio/bin/davgen nuevo
+          test "$(/tmp/limpio/bin/davgen plantillas | grep -c '/')" -ge 60
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  secretos:
+    name: Sin secretos ni datos personales en el repositorio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Buscar patrones prohibidos
+        run: |
+          # Credenciales, hosts o identificadores reales no entran al repo.
+          # (tests/ queda fuera: contiene los patrones para poder buscarlos.)
+          if grep -rInE '(password|passwd|pwd)[[:space:]]*=[[:space:]]*[^[:space:];{$_<]{6,}' \
+               --include='*.ini' --include='*.env' . ; then
+            echo '::error::Hay una contraseña escrita en un archivo de configuración'
+            exit 1
+          fi
+          if grep -rInE '[0-9]{12}-[a-z0-9]{32}\.apps\.googleusercontent\.com' \
+               --exclude-dir=.git --exclude-dir=tests . ; then
+            echo '::error::Hay un Client ID de Google real en el repositorio'
+            exit 1
+          fi

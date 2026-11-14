@@ -1,0 +1,12 @@
+{
+  "name": "davgen",
+  "description": "davgen: de una descripción o un mockup HTML a un sistema web completo (MySQL + Laravel + React).",
+  "owner": { "name": "David Serrudo" },
+  "plugins": [
+    {
+      "name": "davgen",
+      "source": "./",
+      "description": "Crea un sistema web completo (MySQL + Laravel + React) a partir de una descripción o de un mockup HTML, guiando paso a paso con el generador davgen."
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+# Finales de línea LF en todo el texto: las plantillas se copian tal cual al
+# código generado y las pruebas de snapshot comparan byte a byte.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.ico binary

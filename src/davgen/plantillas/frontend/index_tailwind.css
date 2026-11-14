@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Dos temas: claro (por defecto) y oscuro. `--prefersdark` hace que, si la
+   persona no eligió nada, se siga el tema del sistema operativo. La elección
+   manual la aplica src/services/tema.js con data-theme en <html>. */
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+/* La aplicación ocupa toda la pantalla (la plantilla de Vite centraba #root). */
+html, body, #root { min-height: 100%; }
+body { margin: 0; }

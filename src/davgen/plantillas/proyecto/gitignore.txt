@@ -1,0 +1,42 @@
+# .gitignore — generado por davgen (proyecto nuevo).
+#
+# ACCESOS (usuarios y contraseñas de la base y del FTP): uno por entorno, no
+# se versionan. davgen escribe al lado _acceso.<entorno>.ejemplo.ini, que es
+# el mismo archivo sin las contraseñas y SÍ se versiona.
+_acceso.*.ini
+!_acceso.*.ejemplo.ini
+# Los accesos CIFRADOS (_acceso.*.cifrado, ver `davgen acceso`) sí se pueden
+# versionar: sin el token no se leen. No así las copias de un token perdido:
+_acceso.*.cifrado.perdido-*
+
+# A PROPÓSITO *NO* se ignoran (se versionan):
+#   - _configtotal.ini             (configuración del proyecto, sin contraseñas)
+#   - 03-Backend/_backendGenerado/ (código generado: histórico y verificable)
+
+# Copia del backend publicado que baja `davgen comparar --remoto`
+03-Backend/_backendGenerado/_remoto/
+
+# Dependencias (se reinstalan con composer / npm)
+**/node_modules/
+**/vendor/
+
+# Build del frontend
+**/dist/
+**/.vite/
+
+# Artefactos de despliegue y temporales
+*.zip
+.tmp/
+*.log
+
+# Laravel: entorno y runtime (secretos y archivos volátiles)
+03-Backend/**/.env
+03-Backend/**/storage/logs/*
+03-Backend/**/storage/framework/cache/data/*
+03-Backend/**/bootstrap/cache/*.php
+
+# Sistema operativo / editores
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

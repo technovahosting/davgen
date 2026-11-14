@@ -1,0 +1,36 @@
+# davgen:proteccion — NO BORRAR ESTE BLOQUE.
+# En esta carpeta está el proyecto Laravel COMPLETO (no solo su parte pública):
+# sin estas reglas, cualquiera puede bajar por web el .env (contraseña de la
+# base), los logs y los archivos que suben los usuarios.
+# Solo se sirven index.php (la API) y los archivos públicos (favicon, robots…).
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # carpetas internas de Laravel
+    RewriteRule ^(app|bootstrap|config|database|lang|node_modules|resources|routes|storage|tests|vendor)(/|$) - [F,L,NC]
+    # archivos y carpetas ocultos (.env, .git…), salvo .well-known (certificados)
+    RewriteRule (^|/)\.(?!well-known(/|$)) - [F,L]
+    # archivos sueltos del proyecto que no son para el público
+    RewriteRule ^(artisan|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|vite\.config\.js|descomprimir\.php\.bak)$ - [F,L,NC]
+    RewriteRule \.(env|log|sql|sqlite|sqlite3|md|lock|zip|bak|sh|bat|ini|yml|yaml|example)$ - [F,L,NC]
+</IfModule>
+
+# Respaldo por si el servidor no tiene mod_rewrite
+<FilesMatch "^\.(?!well-known)|\.(env|log|sql|sqlite|sqlite3|md|lock|zip|bak)$|^(artisan|composer\.json|composer\.lock|package\.json|phpunit\.xml)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "no-referrer"
+    Header always set Strict-Transport-Security "max-age=31536000" env=HTTPS
+</IfModule>
+# davgen:fin-proteccion

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Biblioteca del barrio — mockup de ejemplo</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 880px; color: #1f2933; }
+  section { border: 1px solid #d9e2ec; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+  label { display: block; margin: .5rem 0 .15rem; font-size: .85rem; color: #52606d; }
+  input, select, textarea { width: 100%; padding: .4rem; box-sizing: border-box; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { border-bottom: 1px solid #d9e2ec; text-align: left; padding: .35rem; }
+</style>
+</head>
+<body>
+<!--
+  Mockup de ejemplo de davgen. Cada <h2> seguido de un formulario es una
+  ENTIDAD; cada campo con atributo name es una COLUMNA. Los <select> con
+  opciones fijas se convierten en ENUM y los campos *_id en claves foráneas.
+-->
+<h1>Biblioteca del barrio</h1>
+
+<section>
+  <h2>Libros</h2>
+  <form>
+    <label>Título</label>          <input type="text" name="titulo" required>
+    <label>Autor</label>           <input type="text" name="autor">
+    <label>ISBN</label>            <input type="text" name="isbn">
+    <label>Año de publicación</label><input type="number" name="anio_publicacion">
+    <label>Género</label>
+    <select name="genero">
+      <option>Seleccione…</option>
+      <option>Novela</option><option>Ensayo</option><option>Infantil</option><option>Técnico</option>
+    </select>
+    <label>Ejemplares disponibles</label><input type="number" name="ejemplares">
+    <label>Precio de reposición</label>  <input type="number" step="0.01" name="precio_reposicion">
+    <label>Reseña</label>          <textarea name="resena"></textarea>
+  </form>
+  <table>
+    <thead><tr><th>Título</th><th>Autor</th><th>Género</th><th>Ejemplares</th><th>Acciones</th></tr></thead>
+    <tbody><tr><td>Cien años de soledad</td><td>G. García Márquez</td><td>Novela</td><td>3</td><td>Editar</td></tr></tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Socios</h2>
+  <form>
+    <label>Nombre completo</label> <input type="text" name="nombre" required>
+    <label>Correo</label>          <input type="email" name="email">
+    <label>Teléfono</label>        <input type="tel" name="telefono">
+    <label>Fecha de alta</label>   <input type="date" name="fecha_alta">
+    <label>Categoría</label>
+    <select name="categoria">
+      <option>Seleccione…</option>
+      <option>Adulto</option><option>Estudiante</option><option>Jubilado</option>
+    </select>
+    <label>Observaciones</label>   <textarea name="observaciones"></textarea>
+  </form>
+</section>
+
+<section>
+  <h2>Préstamos</h2>
+  <form>
+    <label>Libro</label>              <input type="number" name="libro_id" required>
+    <label>Socio</label>              <input type="number" name="socio_id" required>
+    <label>Fecha de préstamo</label>  <input type="date" name="fecha_prestamo">
+    <label>Fecha de devolución</label><input type="date" name="fecha_devolucion">
+    <label>Situación</label>
+    <select name="situacion">
+      <option>Seleccione…</option>
+      <option>Prestado</option><option>Devuelto</option><option>Atrasado</option>
+    </select>
+    <label>Multa</label>              <input type="number" step="0.01" name="multa">
+    <label>Devuelto</label>           <input type="checkbox" name="devuelto">
+  </form>
+</section>
+</body>
+</html>

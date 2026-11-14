@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Construcción y distribución (los binarios van a GitHub Releases, no al repo)
+build/
+dist/
+*.spec
+*.exe
+*.zip
+
+# Carpetas de trabajo de las pruebas y del proyecto de ejemplo
+.tmp/
+
+# Configuración con credenciales reales — nunca en este repositorio
+_configtotal.ini
+.env
+
+# Editores / sistema
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store

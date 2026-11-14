@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="author" content="__AUTOR__">
+<title>davgen — guía del proyecto</title>
+<style>
+  :root { --azul:#1e3a5f; --acento:#2e86ab; --fondo:#f5f7fa; --ok:#2a9d54; }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--fondo);
+         color:#222; display:flex; min-height:100vh; }
+  nav { width:250px; background:var(--azul); color:#fff; padding:18px 0;
+        flex-shrink:0; }
+  nav h1 { font-size:19px; padding:0 18px 4px; }
+  nav .v { font-size:12px; opacity:.7; padding:0 18px 14px; display:block; }
+  nav a { display:block; color:#dfe9f3; text-decoration:none; padding:9px 18px;
+          font-size:14px; border-left:3px solid transparent; cursor:pointer; }
+  nav a:hover { background:rgba(255,255,255,.08); }
+  nav a.activo { background:rgba(255,255,255,.14); border-left-color:#7fd1ff;
+                 color:#fff; font-weight:600; }
+  main { flex:1; padding:30px 40px; max-width:880px; }
+  section { display:none; animation:ap .25s; }
+  section.activa { display:block; }
+  @keyframes ap { from { opacity:0; transform:translateY(6px);} to {opacity:1;} }
+  h2 { color:var(--azul); margin-bottom:14px; font-size:24px; }
+  h3 { color:var(--acento); margin:18px 0 8px; font-size:17px; }
+  p, li { line-height:1.55; font-size:14.5px; }
+  ul, ol { padding-left:22px; margin:8px 0; }
+  table { border-collapse:collapse; width:100%; margin:10px 0; font-size:13.5px;
+          background:#fff; }
+  th, td { border:1px solid #d8dee6; padding:7px 10px; text-align:left; }
+  th { background:var(--azul); color:#fff; }
+  tr:nth-child(even) td { background:#f0f4f8; }
+  code { background:#e8edf3; padding:1px 6px; border-radius:4px;
+         font-size:13px; color:#143; }
+  pre { background:#16222e; color:#cfe3f5; padding:12px 14px; border-radius:8px;
+        overflow-x:auto; font-size:13px; margin:10px 0; }
+  .tarjeta { background:#fff; border:1px solid #dde4ec; border-radius:10px;
+             padding:14px 18px; margin:10px 0; }
+  .aviso { border-left:4px solid #e76f51; }
+  .check { display:flex; gap:10px; align-items:flex-start; padding:8px 0;
+           border-bottom:1px dashed #e2e8f0; }
+  .check input { margin-top:4px; transform:scale(1.25); cursor:pointer; }
+  .check label { cursor:pointer; font-size:14.5px; line-height:1.5; }
+  .check.hecho label { text-decoration:line-through; opacity:.55; }
+  footer { font-size:12.5px; color:#778; margin-top:34px; border-top:1px solid
+           #dde4ec; padding-top:10px; }
+</style>
+</head>
+<body>
+<nav>
+  <h1>davgen</h1><span class="v">v__VERSION__ — guía del proyecto</span>
+  <a data-s="inicio" class="activo">① Inicio rápido</a>
+  <a data-s="config">② _configtotal.ini</a>
+  <a data-s="proceso">③ El proceso (fases)</a>
+  <a data-s="docs">④ Documentos a completar</a>
+  <a data-s="prompts">⑤ Prompts de IA</a>
+  <a data-s="reglas">⑥ Reglas de oro</a>
+  <a data-s="pruebas">⑦ Pruebas y despliegue</a>
+  <a data-s="modulos">⑧ Módulos activos</a>
+  <a data-s="nogenerado">⑨ Qué no editar</a>
+</nav>
+<main>
+
+<section id="inicio" class="activa">
+  <h2>① Inicio rápido — checklist</h2>
+  <p>Marca cada paso al completarlo (se guarda en este navegador):</p>
+  <div class="tarjeta" id="checklist">
+    <div class="check"><input type="checkbox" id="c1"><label for="c1">
+      <b>Configurar <code>_configtotal.ini</code></b> (raíz del proyecto):
+      <code>[proyecto]</code> nombre y módulo, <code>[bd]</code> credenciales
+      de MySQL y <code>[entrada]</code> tipo (ver pestaña ②).</label></div>
+    <div class="check"><input type="checkbox" id="c2"><label for="c2">
+      <b>Crear la base de datos</b> MySQL (utf8mb4) vacía con el nombre
+      puesto en <code>[bd] database</code>.</label></div>
+    <div class="check"><input type="checkbox" id="c3"><label for="c3">
+      <b>Completar <code>00-Requisitos\requisitos.md</code></b> (visión,
+      alcance, roles, requisitos).</label></div>
+    <div class="check"><input type="checkbox" id="c4"><label for="c4">
+      <b>Generar el mockup .html</b> con
+      <code>_prompts\prompt-1-mockup.md</code> y guardarlo en
+      <code>01-Mockups\</code>.</label></div>
+    <div class="check"><input type="checkbox" id="c5"><label for="c5">
+      <b>Crear las tablas de negocio</b> con
+      <code>_prompts\prompt-2-tablas-desde-mockup.md</code> y ejecutar el
+      SQL en la BD (si se usa <code>[entrada] tipo=bd</code>).</label></div>
+    <div class="check"><input type="checkbox" id="c6"><label for="c6">
+      <b>Ejecutar el generador:</b> <code>davgen generar</code> en la raíz
+      del proyecto. Crea BD de seguridad, backend Laravel, frontend React y
+      pruebas.</label></div>
+    <div class="check"><input type="checkbox" id="c7"><label for="c7">
+      <b>Ejecutar los scripts SQL generados</b> en orden:
+      <code>01_seguridad.sql</code> → <code>03_procedimientos.sql</code> y
+      entrar con el <code>admin_email</code> y la <code>admin_password</code>
+      de <code>_configtotal.ini</code> (¡cambiarla al primer ingreso!).
+      </label></div>
+    <div class="check"><input type="checkbox" id="c8"><label for="c8">
+      <b>Probar:</b> <code>05-Testing\generados\pruebas-api.ps1</code>
+      (ver pestaña ⑦).</label></div>
+    <div class="check"><input type="checkbox" id="c9"><label for="c9">
+      <b>Desplegar a la nube</b> (opcional): completar <code>[ftp]</code> y
+      ejecutar <code>davgen generar --produccion si --front si</code>.
+      </label></div>
+  </div>
+</section>
+
+<section id="config">
+  <h2>② _configtotal.ini — qué configurar</h2>
+  <p>Es el ÚNICO archivo a completar (raíz del proyecto). Secciones:</p>
+  <table>
+    <tr><th>Sección</th><th>Clave</th><th>Qué poner</th></tr>
+    <tr><td rowspan="3"><code>[proyecto]</code></td><td>nombre</td>
+        <td><b>REQUERIDO</b> — nombre visible del sistema</td></tr>
+    <tr><td>modulo</td><td><b>REQUERIDO</b> — prefijo de tablas (2-6 letras):
+        <code>tbl_{modulo}_*</code></td></tr>
+    <tr><td>autor</td><td>aparece en el <code>@author</code> del código
+        generado</td></tr>
+    <tr><td><code>[entrada]</code></td><td>tipo / mockup</td>
+        <td><code>mockup</code> (lee el .html) o <code>bd</code> (lee las
+        tablas ya creadas en MySQL)</td></tr>
+    <tr><td><code>[bd]</code></td><td>host, puerto, usuario, password,
+        database</td><td><b>REQUERIDO</b> — conexión MySQL (se valida con
+        conexión real)</td></tr>
+    <tr><td><code>[opciones]</code></td><td>excluir, publico, solo_lectura,
+        sin_baja, solo_consulta</td><td>ajustes por tabla (opcional)</td></tr>
+    <tr><td><code>[ftp]</code></td><td>host, usuario, password, ruta_remota,
+        url</td><td>solo para desplegar a la nube</td></tr>
+  </table>
+  <div class="tarjeta aviso"><b>⚠ Secretos:</b> _configtotal.ini contiene
+  credenciales — NO subirlo a git (ya está en .gitignore).</div>
+</section>
+
+<section id="proceso">
+  <h2>③ El proceso — fases 0 → 6</h2>
+  <table>
+    <tr><th>#</th><th>Fase</th><th>Carpeta</th><th>Quién lo hace</th></tr>
+    <tr><td>0</td><td>Requisitos</td><td><code>00-Requisitos\</code></td>
+        <td>Usuario (plantilla <code>requisitos.md</code>)</td></tr>
+    <tr><td>1</td><td>Mockups</td><td><code>01-Mockups\</code></td>
+        <td>Usuario + IA (prompt 1)</td></tr>
+    <tr><td>2</td><td>Base de datos</td><td><code>02-Base-de-datos\</code></td>
+        <td>Usuario + IA (prompt 2); seguridad la pone davgen</td></tr>
+    <tr><td>3</td><td>Backend</td><td><code>03-Backend\</code></td>
+        <td><b>davgen</b> (Laravel: auth+2FA+API completa)</td></tr>
+    <tr><td>4</td><td>Frontend</td><td><code>04-Frontend\</code></td>
+        <td><b>davgen</b> (React: services + páginas CRUD)</td></tr>
+    <tr><td>5</td><td>Testing</td><td><code>05-Testing\</code></td>
+        <td><b>davgen</b> (smoke E2E) + usuario (UAT)</td></tr>
+    <tr><td>6</td><td>Despliegue</td><td>—</td>
+        <td><b>davgen</b> (<code>--produccion si --front si</code>)</td></tr>
+  </table>
+  <p>Cada fase reduce la incertidumbre de la siguiente: requisitos → qué
+  pantallas; mockups → qué datos; datos → qué API; API → qué consume el
+  frontend.</p>
+  <h3>Cuando la BD cambie después</h3>
+  <p><code>davgen sincronizar</code> compara el esquema contra la última
+  generación: si no cambió termina al instante; si cambió, regenera y sube
+  a la nube SOLO los archivos afectados.</p>
+</section>
+
+<section id="docs">
+  <h2>④ Documentos a completar (plantillas estándar)</h2>
+  <p>davgen copia UNA plantilla por fase — son los únicos documentos a
+  mantener (nunca se sobrescriben):</p>
+  <table>
+    <tr><th>Documento</th><th>Qué se llena</th></tr>
+    <tr><td><code>00-Requisitos\requisitos.md</code></td>
+        <td>Visión, alcance, roles, RF/RNF, casos de uso, glosario</td></tr>
+    <tr><td><code>01-Mockups\mockups.md</code></td>
+        <td>Inventario de pantallas, navegación, acta de revisión</td></tr>
+    <tr><td><code>02-Base-de-datos\base-de-datos.md</code></td>
+        <td>Modelo ER, diccionario de datos, SPs de negocio</td></tr>
+    <tr><td><code>05-Testing\plan-de-pruebas.md</code></td>
+        <td>Casos UAT manuales y reporte de ejecución</td></tr>
+  </table>
+  <p>El resto de la documentación la genera davgen en cada corrida
+  (<code>RESUMEN.md</code>, <code>guia.md</code>, <code>readme_cero.md</code>,
+  <code>README-SEGURIDAD.md</code>, guías de pruebas) — no editarla.</p>
+</section>
+
+<section id="prompts">
+  <h2>⑤ Prompts de IA (carpeta <code>_prompts\</code>)</h2>
+  <table>
+    <tr><th>Prompt</th><th>Cuándo usarlo</th></tr>
+    <tr><td><code>prompt-1-mockup.md</code></td>
+        <td>Requisitos → mockup .html que davgen sabe parsear</td></tr>
+    <tr><td><code>prompt-2-tablas-desde-mockup.md</code></td>
+        <td>Mockup → CREATE TABLE + vistas con el estándar davgen</td></tr>
+    <tr><td><code>prompt-3-sp-dominio.md</code></td>
+        <td>Operaciones de negocio (confirmar, cancelar…): SPs
+        <code>pag_*</code></td></tr>
+    <tr><td><code>prompt-4-personalizacion.md</code></td>
+        <td>Lógica/pantallas a medida SIN tocar el código generado</td></tr>
+  </table>
+  <p>Se regeneran en cada corrida con el módulo del proyecto ya resuelto.</p>
+</section>
+
+<section id="reglas">
+  <h2>⑥ Reglas de oro</h2>
+  <div class="tarjeta aviso">
+    <b>1 · El código generado NO se edita.</b> Se REEMPLAZA al regenerar
+    (carpetas con <code>_NO-MODIFICAR.md</code>). Si alguien editó algo,
+    davgen lo respalda en <code>_backendGenerado\_respaldo-ediciones\</code>
+    antes de sobrescribir — pero la personalización va en clases que
+    EXTIENDEN los services, en páginas propias y en <code>App.jsx</code>.
+  </div>
+  <div class="tarjeta">
+    <b>2 · La administración es por BASE DE DATOS.</b> Roles
+    (<code>tbl_seg_rol</code>), permisos (<code>tbl_seg_permiso</code>),
+    menú (<code>tbl_seg_modulo</code>) y parámetros como 2FA obligatorio
+    (<code>tbl_seg_parametro</code>): se editan ahí, sin regenerar.
+  </div>
+  <div class="tarjeta">
+    <b>3 · Tablas:</b> el usuario crea SOLO tablas de negocio
+    (<code>tbl_{modulo}_*</code> + vista <code>vis_*</code>); las de
+    seguridad/autenticación ya existen y no se tocan
+    (ver <code>02-Base-de-datos\readme_cero.md</code>).
+  </div>
+</section>
+
+<section id="pruebas">
+  <h2>⑦ Pruebas y despliegue</h2>
+  <h3>Smoke test E2E (generado)</h3>
+  <pre>cd 05-Testing\generados
+.\pruebas-api.ps1                                  # backend local
+.\pruebas-api.ps1 -Api https://{dominio}/servicio/api   # nube</pre>
+  <p>También se genera <code>postman_collection.json</code> (importar en
+  Postman: el Login guarda el token solo) y <code>api.http</code>.</p>
+  <h3>Despliegue a la nube (FTP)</h3>
+  <pre>davgen generar --produccion si --front si</pre>
+  <ul>
+    <li><b>Primera vez:</b> sube el Laravel completo (zip) y lo extrae en el
+        servidor; el frontend se construye y sube a la raíz.</li>
+    <li><b>Siguientes:</b> sube SOLO el delta del código generado
+        (segundos). <code>davgen sincronizar --si --produccion si</code>
+        automatiza todo el ciclo.</li>
+  </ul>
+</section>
+
+<section id="modulos">
+  <h2>⑧ Módulos activos — flags de <code>[generar]</code></h2>
+  <p>En modo interactivo, el generador muestra un menú de toggles antes de
+  arrancar. Los cambios se guardan en <code>_configtotal.ini</code> y
+  persisten en la próxima ejecución. Con <code>--si</code> se omite el menú.</p>
+  <table>
+    <tr><th>Flag</th><th>Por defecto</th><th>Qué genera</th><th>Cuándo activar</th></tr>
+    <tr>
+      <td><code>aplicar_sps</code></td><td>✓ activo</td>
+      <td>Compara y ejecuta los SPs <code>pcru*</code> en la BD (DROP+CREATE
+          solo los nuevos o distintos)</td>
+      <td>Siempre — mantiene los SPs sincronizados sin ejecutar el SQL a mano</td>
+    </tr>
+    <tr>
+      <td><code>produccion</code></td><td>✓ activo</td>
+      <td>Despliega el backend Laravel a la nube por FTP (zip completo la
+          primera vez; delta incremental las siguientes)</td>
+      <td>Cuando <code>[ftp]</code> está completo y se quiere desplegar</td>
+    </tr>
+    <tr>
+      <td><code>front</code></td><td>✓ activo</td>
+      <td>Ejecuta <code>npm run build</code> y sube <code>dist/</code> a la
+          raíz del FTP. Omite el build si las fuentes no cambiaron.</td>
+      <td>Cuando <code>[ftp]</code> está completo y hay proyecto React</td>
+    </tr>
+    <tr>
+      <td><code>form_requests</code></td><td>☐ desactivado</td>
+      <td><code>app/Http/Requests/{Tabla}Request.php</code> con reglas 422
+          derivadas del esquema (required/nullable, max:N, in: enum, email)</td>
+      <td>Cuando se quiere validación automática en el servidor antes del SP</td>
+    </tr>
+    <tr>
+      <td><code>tests</code></td><td>☐ desactivado</td>
+      <td>Suite PHPUnit: <code>AuthTest</code> (422/401), <code>RutasTest</code>
+          (401 por tabla), <code>RateLimitTest</code> (429) +
+          <code>tests/Datos/{Tabla}Datos.php</code></td>
+      <td>Para ejecutar <code>php artisan test</code> en CI o antes de desplegar</td>
+    </tr>
+    <tr>
+      <td><code>componentes_react</code></td><td>☐ desactivado</td>
+      <td>Hooks <code>useCrud/useAuth</code> + componentes <code>DataTable</code>,
+          <code>CampoFormulario</code>, <code>SelectRelacion</code> (FK como
+          dropdown), <code>Paginacion</code> en <code>src/hooks/</code> y
+          <code>src/components/generados/</code></td>
+      <td>Para UI más rica; los campos <code>*_id</code> usan
+          <code>SelectRelacion</code> automáticamente</td>
+    </tr>
+    <tr>
+      <td><code>ci</code></td><td>☐ desactivado</td>
+      <td><code>.github/workflows/ci.yml</code>: test PHP, build React y
+          <code>davgen verificar</code> (rompe el build si se editó lo generado)</td>
+      <td>Para proyectos con GitHub Actions</td>
+    </tr>
+    <tr>
+      <td><code>openapi</code></td><td>☐ desactivado</td>
+      <td><code>openapi.json</code> (OpenAPI 3) + <code>swagger.html</code>
+          (Swagger UI) en <code>_backendGenerado/documentacion/</code></td>
+      <td>Para documentar la API automáticamente</td>
+    </tr>
+    <tr>
+      <td><code>export</code></td><td>☐ desactivado</td>
+      <td>Endpoint <code>POST /{tabla}/export</code> que devuelve CSV desde
+          la vista <code>vis_*</code> (requiere permiso <code>sel</code>)</td>
+      <td>Cuando los usuarios necesitan exportar datos a Excel/CSV</td>
+    </tr>
+  </table>
+</section>
+
+<section id="nogenerado">
+  <h2>⑨ Qué no editar — y qué sí personalizar</h2>
+  <div class="tarjeta aviso">
+    <b>❌ Estos archivos se REEMPLAZAN en cada <code>davgen generar</code></b>
+    — editarlos a mano significa perder los cambios al regenerar:
+    <ul>
+      <li><code>servicio/app/Http/Controllers/*Controller.php</code> — Controllers
+          delgados (solo llaman al Service)</li>
+      <li><code>servicio/app/Services/*Service.php</code> — Services CRUD con
+          auth+2FA (BaseService)</li>
+      <li><code>servicio/routes/api.php</code> y <code>web.php</code> — rutas
+          de la API y health-check</li>
+      <li><code>04-Frontend.../src/services/*Service.js</code> — servicios JS
+          de cada entidad</li>
+      <li><code>04-Frontend.../src/pages/*.jsx</code> — páginas CRUD generadas</li>
+      <li>SPs <code>pcru*</code> en la BD — se regeneran y aplican con
+          <code>aplicar_sps</code></li>
+    </ul>
+  </div>
+  <div class="tarjeta">
+    <b>✅ Estos archivos son seguros para personalizar</b> — el generador no
+    los sobreescribe:
+    <ul>
+      <li><b>Clases que extienden los Services</b>: crea
+          <code>app/Services/Custom{Entidad}Service.php</code> extendiendo
+          <code>{Entidad}Service</code> y agrega la lógica de negocio ahí</li>
+      <li><b>SPs de dominio <code>pag_*</code></b> (confirmar, cancelar…):
+          en <code>02-Base-de-datos/</code> — el generador no los toca</li>
+      <li><b><code>src/App.jsx</code></b> — pantalla de login y navegación
+          principal (se crea una vez; nunca se sobreescribe)</li>
+      <li><b><code>src/api.js</code></b> y <b><code>src/authService.js</code></b>
+          — configuración Axios y lógica de auth (se crean una vez)</li>
+      <li><b>Tablas <code>tbl_seg_*</code></b> — roles, permisos, menú y
+          parámetros runtime (2FA, rate-limit, Google auth…)</li>
+    </ul>
+  </div>
+  <h3>Herramientas de diagnóstico</h3>
+  <pre>davgen verificar   # detecta qué archivos generados fueron editados (exit 0/1)
+davgen comparar    # muestra el diff exacto entre lo generado y lo editado</pre>
+  <p>Si <code>verificar</code> reporta archivos MODIFICADO y quieres conservar
+  los cambios, extráelos antes de regenerar. Si solo quieres restaurar el código
+  original, ejecuta <code>davgen generar</code> — las ediciones se respaldan
+  en <code>_backendGenerado/_respaldo-ediciones/</code>.</p>
+</section>
+
+<footer>davgen v__VERSION__ · Autor: __AUTOR__ · Esta guía se regenera en
+cada corrida del generador.</footer>
+</main>
+<script>
+  var enlaces = document.querySelectorAll('nav a');
+  enlaces.forEach(function (a) {
+    a.onclick = function () {
+      enlaces.forEach(function (x) { x.classList.remove('activo'); });
+      a.classList.add('activo');
+      document.querySelectorAll('section').forEach(function (s) {
+        s.classList.toggle('activa', s.id === a.dataset.s);
+      });
+    };
+  });
+  document.querySelectorAll('.check input').forEach(function (c) {
+    var clave = 'davgen-' + c.id;
+    c.checked = localStorage.getItem(clave) === '1';
+    c.parentElement.classList.toggle('hecho', c.checked);
+    c.onchange = function () {
+      localStorage.setItem(clave, c.checked ? '1' : '0');
+      c.parentElement.classList.toggle('hecho', c.checked);
+    };
+  });
+</script>
+</body>
+</html>

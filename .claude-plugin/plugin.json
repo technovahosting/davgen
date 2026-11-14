@@ -1,0 +1,10 @@
+{
+  "name": "davgen",
+  "version": "5.1.0",
+  "description": "Crea un sistema web completo (MySQL + Laravel + React) a partir de una descripción o de un mockup HTML, guiando paso a paso con el generador davgen.",
+  "author": { "name": "David Serrudo" },
+  "homepage": "https://github.com/technovahosting/davgen",
+  "repository": "https://github.com/technovahosting/davgen",
+  "license": "MIT",
+  "keywords": ["generador", "crud", "laravel", "react", "mysql", "estudiantes"]
+}

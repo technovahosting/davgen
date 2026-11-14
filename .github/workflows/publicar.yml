@@ -1,0 +1,42 @@
+# Publica davgen en PyPI cuando se publica un Release en GitHub.
+#
+# Usa «Trusted Publishing» (OIDC): NO hay tokens ni contraseñas guardados.
+# Configuración única, antes del primer release:
+#   1. Crear el proyecto en https://pypi.org y, en Publishing, agregar este
+#      repositorio + el workflow `publicar.yml` + el entorno `pypi`.
+#   2. En GitHub → Settings → Environments, crear el entorno `pypi`
+#      (conviene exigir aprobación manual).
+# Hasta entonces este workflow no puede publicar nada. Pasos en docs/publicar.md.
+name: Publicar en PyPI
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: La etiqueta debe coincidir con la versión del código
+        env:
+          ETIQUETA: ${{ github.event.release.tag_name }}
+        run: |
+          version=$(python -c "import sys; sys.path.insert(0, 'src'); from davgen.nucleo.version import VERSION; print(VERSION)")
+          test "v$version" = "$ETIQUETA" || { echo "::error::etiqueta $ETIQUETA ≠ v$version"; exit 1; }
+      - name: Pruebas
+        run: |
+          python -m pip install -e ".[dev]"
+          python -m pytest
+      - name: Construir
+        run: python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
